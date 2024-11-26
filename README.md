@@ -40,12 +40,14 @@ s := scheduler.NewScheduler()
 Create a struct that implements the `Task` interface:
 
 ```go
-type MyTask struct{} //add in values needed for the execute task
+type PrintTask struct { //add in values needed for the execute task
+	content string
+}
 
 //Execute performs the task in the scheduler.
-func (t *MyTask) Execute() error {
-    fmt.Println("Executing MyTask!")
-    return nil
+func (t *PrintTask) Execute() error {
+	fmt.Println(t.content)
+	return nil
 }
 ```
 
@@ -55,7 +57,7 @@ Add tasks to the scheduler using the `AddTask` method:
 
 ```go
 taskName := "task1"
-myTask := &MyTask{}
+myTask := &PrintTask{content:"test"}
 scheduledTask := scheduler.ScheduledTask{
     Interval: 2 * time.Second, // Execute every 2 seconds
     Task:     myTask,
@@ -108,29 +110,34 @@ import (
     "github.com/yingwei123/scheduler"
 )
 
-type MyTask struct{}
+type PrintTask struct {
+	content string
+}
 
-func (t *MyTask) Execute() error {
-    fmt.Println("Executing MyTask!")
-    return nil
+func (t *PrintTask) Execute() error {
+	fmt.Println(t.content)
+	return nil
 }
 
 func main() {
     s := scheduler.NewScheduler()
 
-    // Define and add tasks
-    myTask := &MyTask{}
-    scheduledTask := scheduler.ScheduledTask{
-        Interval: 2 * time.Second,
-        Task:     myTask,
-        Repeat:   true,
-    }
-    if err := s.AddTask(scheduledTask, "task1"); err != nil {
-        log.Fatalf("Failed to add task: %v", err)
-    }
+    //define the scheduledTask
+	taskName := "task1"
+	myTask := &PrintTask{content: "test"}
+	scheduledTask := scheduler.ScheduledTask{
+		Interval: 2 * time.Second, // Execute every 2 seconds
+		Task:     myTask,
+		Repeat:   true, // Repeat execution
+	}
 
-    // Start the scheduler
-    go s.Start()
+    //add the task
+	if err := s.AddTask(scheduledTask, taskName); err != nil {
+		log.Fatalf("Failed to add task: %v", err)
+	}
+
+    //start the scheduler
+	go s.Start()
 
     // Run for 10 seconds before stopping
     time.Sleep(10 * time.Second)
